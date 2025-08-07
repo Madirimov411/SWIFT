@@ -1,1 +1,181 @@
-# SWIFT
+# 📱 ViewController Lifecycle (Swift - iOS)
+
+Bu hujjatda iOS ilovalarida `UIViewController` ning hayotiy sikli (Lifecycle) qanday ishlashi haqida to‘liq ma’lumot beriladi. 🍎  
+ViewController bu — har bir ekran uchun alohida ob’yekt. Uning **lifecycle** metodlari orqali siz ilovaning turli bosqichlarida kerakli kodni ishlatishingiz mumkin.
+
+---
+
+## 📌 ViewController nima va qanday “yashaydi”?
+
+`UIViewController` — iOS ilovasidagi har bir ekran (yoki sahifa) uchun asosiy komponent.  
+Tizim (iOS) quyidagi tartibda ViewController’ni yaratadi va boshqaradi — bu **lifecycle** deb nomlanadi.
+
+---
+
+## 🚦 Lifecycle Bosqichlari
+
+### ✅ 1. `viewDidLoad()`
+
+- ViewController birinchi marta yaratilganda chaqiriladi.
+- IBOutlets (label, button, tableView va h.k.) bu vaqtda mavjud bo‘ladi.
+- Odatda bu yerda UI sozlashlar, delegate berishlar, boshlang‘ich holatlar tayinlanadi.
+
+```swift
+override func viewDidLoad() {
+    super.viewDidLoad()
+    print("viewDidLoad called")
+}
+```
+
+## ✅ 2. `viewWillAppear(_:)`
+
+*   ViewController ekranda **ko‘rinishidan oldin** chaqiriladi.
+*   Bu yerda siz:
+    - `navigationBar` ni yashirishingiz yoki ko‘rsatishingiz,
+    - UI holatini dinamik o‘zgartirishingiz mumkin.
+
+```swift
+override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    print("viewWillAppear called")
+}
+```
+
+## ✅ 3. `viewDidAppear(_:)`
+
+- View to‘liq ekranda **ko‘ringanidan keyin** chaqiriladi.
+- Bu joyda siz:
+  - Animatsiyalarni boshlashingiz,
+  - Timer’larni ishga tushirishingiz,
+  - Foydalanuvchiga darhol ko‘rinadigan funksiyalarni ishga tushirishingiz mumkin.
+
+```swift
+override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    print("viewDidAppear called")
+}
+```
+
+## ✅ 4. `viewWillDisappear(_:)`
+
+- ViewController boshqa sahifaga o‘tayotganida yoki yopilayotganida chaqiriladi.
+- Bu metod foydalanuvchiga hali ko‘rinib turgan, ammo tez orada yo‘qoladigan UI holatlarini tayyorlash uchun ishlatiladi.
+
+📌 Misol:
+- Video/audio’ni pauza qilish
+- API so‘rovlarini to‘xtatish
+- UI elementlarni yashirish
+
+```swift
+override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    print("viewWillDisappear called")
+}
+```
+
+## ✅ 5. `viewDidDisappear(_:)`
+
+- View butunlay ekrandan **yo‘qolgach** chaqiriladi.
+- Bu metodda siz:
+  - Resurslarni tozalashingiz,
+  - Loglar yozishingiz,
+  - Timer’larni o‘chirishingiz mumkin.
+
+```swift
+override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+    print("viewDidDisappear called")
+}
+```
+
+## 🤔 `prepare(for:sender:)` qanday ishlaydi?
+
+Agar siz storyboard’da `segue` orqali boshqa ViewController’ga o‘tsangiz, bu metod chaqiriladi.  
+Bu yerda siz keyingi ekranga ma'lumot uzatishingiz mumkin:
+
+```swift
+override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if let destinationVC = segue.destination as? ViewController2 {
+        // Diqqat: bu yerda IBOutlets hali `nil` bo'lishi mumkin!
+        // Masalan: destinationVC.username = "Hello"
+    }
+}
+```
+
+## ⚠️ Muhim eslatma
+
+- `prepare(for:sender:)` metodi chaqirilgan vaqtda, `destinationVC` obyekti mavjud bo‘ladi, **lekin uning `IBOutlet` elementlari hali `nil`** bo‘ladi.
+- Buning sababi — bu elementlar faqat `viewDidLoad()` chaqirilgandan keyin yaratiladi.
+
+```swift
+// ⚠️ BU XATOLIKKA OLIB KELADI!
+override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if let destination = segue.destination as? ViewController2 {
+        destination.titleLabel.text = "Salom" // ❌ CRASH
+    }
+}
+```
+
+## 📍 To‘g‘ri Yechim
+
+UI elementlar bilan ishlashni `viewDidLoad()` yoki undan keyingi lifecycle metodlariga qoldiring.  
+Aks holda, `IBOutlet` lar hali `nil` bo‘lishi mumkin.
+
+Agar siz `prepare(for:)` metodida ma’lumot uzatmoqchi bo‘lsangiz, **faqat model yoki oddiy qiymatlar** yuboring.
+
+```swift
+// ✅ TO‘G‘RI YONDASHUV
+override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    if let destination = segue.destination as? ViewController2 {
+        destination.userName = "Ali" // faqat model ma’lumot uzatyapmiz
+    }
+}
+```
+
+## 📲 Navigatsiya: `Show` vs `Present Modally`
+
+| Segue turi         | Ekran ko‘rinishi                     | Lifecycle ta’siri                                   |
+|---------------------|--------------------------------------|-----------------------------------------------------|
+| `Show`              | VC1 orqa fonda yashirin qoladi       | `viewWillDisappear` **ba'zan chaqirilmasligi mumkin** |
+| `Present Modally`   | VC2 VC1’ni to‘liq yopadi             | `viewDidDisappear` **doim chaqiriladi**            |
+
+> 🎬 `Modal Presentation` holatida yangi ViewController ekranni to‘liq egallaydi.  
+> Shu sababli avvalgi sahifa **butunlay ko‘rinmaydi** va uning lifecycle metodlari **to‘liq ishlaydi**.
+
+---
+
+## ✅ Xulosa
+
+- `viewDidLoad` — View birinchi marta yuklanganda (faqat **1 marta**)
+- `viewWillAppear`, `viewDidAppear` — ViewController **har safar ekranda ko‘ringanda**
+- `viewWillDisappear`, `viewDidDisappear` — ViewController **har safar yopilganda**
+- `prepare(for:)` — Segue orqali boshqa ViewController’ga o‘tilayotganda
+  > ℹ️ Ammo `IBOutlet` hali mavjud emas — ehtiyot bo‘ling!
+
+---
+
+## 💡 Pro Tip
+
+Ushbu kod lifecycle metodining nomini avtomatik tarzda chop etadi:
+
+```swift
+print(#function)
+```
+
+🔍 Debug jarayonida aynan qaysi metodlar va qanday tartibda chaqirilayotganini aniq kuzatish imkonini beradi.  
+Bu esa sizga ilova oqimini tushunish va muammolarni topishda juda katta yordam beradi.
+
+---
+
+## 🎓 Yakuniy Tavsiyalar
+
+- Har bir lifecycle metodining **maqsadi** va **chaqirilish vaqtini** chuqur tushunib oling.
+- UI o‘zgarishlari, animatsiyalar va ma’lumot uzatishni **tegishli lifecycle bosqichlarida** bajaring.
+- `viewDidLoad` — UI bilan ishlash uchun **eng xavfsiz va kafolatli joy** hisoblanadi.
+- `prepare(for:)` — faqat **data uzatish** uchun ishlatiladi; hech qachon `IBOutlet` bilan ishlamang.
+- Navigatsiya turi (`Show`, `Present Modally`) lifecycle oqimiga **bevosita ta’sir qiladi** — bu holatlarni **test qilib ishonch hosil qiling**.
+- Kodni har doim **modulli**, **izchil**, va **toza** yozing — bu **professional ishlab chiquvchining mezonidir**.
+
+---
+
+🎓 _iOS dasturchi sifatida lifecycle’larni chuqur tushunish — sizni kuchliroq, samaraliroq va professionallar safidagi developer’ga aylantiradi._

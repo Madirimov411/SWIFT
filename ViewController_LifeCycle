@@ -25,6 +25,7 @@ override func viewDidLoad() {
     super.viewDidLoad()
     print("viewDidLoad called")
 }
+```
 
 ## ✅ 2. `viewWillAppear(_:)`
 
@@ -38,6 +39,7 @@ override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     print("viewWillAppear called")
 }
+```
 
 ## ✅ 3. `viewDidAppear(_:)`
 
@@ -52,6 +54,7 @@ override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     print("viewDidAppear called")
 }
+```
 
 ## ✅ 4. `viewWillDisappear(_:)`
 
@@ -68,6 +71,7 @@ override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
     print("viewWillDisappear called")
 }
+```
 
 ## ✅ 5. `viewDidDisappear(_:)`
 
@@ -82,6 +86,7 @@ override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     print("viewDidDisappear called")
 }
+```
 
 ## 🤔 `prepare(for:sender:)` qanday ishlaydi?
 
@@ -95,7 +100,7 @@ override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Masalan: destinationVC.username = "Hello"
     }
 }
-
+```
 
 ## ⚠️ Muhim eslatma
 
@@ -109,6 +114,7 @@ override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         destination.titleLabel.text = "Salom" // ❌ CRASH
     }
 }
+```
 
 ## 📍 To‘g‘ri Yechim
 
@@ -124,6 +130,7 @@ override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         destination.userName = "Ali" // faqat model ma’lumot uzatyapmiz
     }
 }
+```
 
 ## 📲 Navigatsiya: `Show` vs `Present Modally`
 
@@ -153,6 +160,7 @@ Ushbu kod lifecycle metodining nomini avtomatik tarzda chop etadi:
 
 ```swift
 print(#function)
+```
 
 🔍 Debug jarayonida aynan qaysi metodlar va qanday tartibda chaqirilayotganini aniq kuzatish imkonini beradi.  
 Bu esa sizga ilova oqimini tushunish va muammolarni topishda juda katta yordam beradi.
@@ -171,4 +179,3 @@ Bu esa sizga ilova oqimini tushunish va muammolarni topishda juda katta yordam b
 ---
 
 🎓 _iOS dasturchi sifatida lifecycle’larni chuqur tushunish — sizni kuchliroq, samaraliroq va professionallar safidagi developer’ga aylantiradi._
-

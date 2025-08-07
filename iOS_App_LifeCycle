@@ -1,0 +1,146 @@
+# 📱 iOS App Lifecycle (Swift)
+
+iOS ilovasi faqatgina ViewController'lar orqali emas, balki butun tizim darajasida ham turli hayotiy bosqichlardan o‘tadi.  
+Ushbu hujjatda `AppDelegate`, `SceneDelegate`, va `ViewController` larni o‘z ichiga olgan **to‘liq lifecycle tushunchasi** yoritiladi. 🚀
+
+---
+
+## 🔄 ViewController va App Lifecycle o‘rtasidagi farq
+
+ViewController faqatgina **bitta ekran**ni anglatadi.  
+Ammo butun ilovaning hayoti bu ekranlar to‘plamidan **kattaroq** kontekstda qaraladi.
+
+| Komponent        | Nimani anglatadi?            | Misollar                      |
+|------------------|-------------------------------|-------------------------------|
+| ViewController   | Bitta ekran (UI sahifa)       | Profil sahifasi, Chat ekran  |
+| Scene            | Bitta oynadagi VClar to‘plami | iPad multi-window             |
+| App              | Butun ilova (foydalanuvchi uchun) | FlashChat, TikTok, Safari     |
+
+---
+
+## 🔥 iOS App Lifecycle Bosqichlari
+
+1. ✅ **Ilova ishga tushadi** – `application(_:didFinishLaunchingWithOptions:)`
+2. ✅ **Ilova oynasi ko‘rinadi** – `scene(_:willConnectTo:)`
+3. ✅ **Ilova aktiv holatda** – `sceneDidBecomeActive(_:)`
+4. ✅ **Ilova passiv bo‘ladi** – `sceneWillResignActive(_:)`
+5. ✅ **Ilova background’ga o‘tadi** – `sceneDidEnterBackground(_:)`
+6. ✅ **Ilova foreground’ga qaytadi** – `sceneWillEnterForeground(_:)`
+7. ✅ **Ilova o‘chiriladi yoki sahna yopiladi** – `application(_:didDiscardSceneSessions:)`
+
+---
+
+## 🧠 Nega bu sizga kerak?
+
+Agar foydalanuvchi forma to‘ldirayotgan bo‘lsa va telefon qo‘ng‘irog‘i bo‘lsa yoki boshqa app ochilsa — siz bu holatlarni `sceneDidEnterBackground` da ushlab, **foydalanuvchi ma'lumotini saqlashingiz kerak**.
+
+Aks holda, **hamma yozilgan narsa yo‘qoladi** ❌
+
+---
+
+## 📁 AppDelegate vs SceneDelegate
+
+### 🔧 AppDelegate.swift — App darajasidagi lifecycle’lar
+
+```swift
+func application(_ application: UIApplication,
+                 didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    FirebaseApp.configure() // App ishga tushganda
+    return true
+}
+```
+
+```swift
+func application(_ application: UIApplication,
+                 didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+    // Ilova sahnasi o‘chirildi
+}
+```
+
+## 🖼 SceneDelegate.swift — Har bir oynaga xos lifecycle’lar
+
+```swift
+func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+           options connectionOptions: UIScene.ConnectionOptions) {
+    // Sahna tayyorlanmoqda
+}
+
+func sceneDidBecomeActive(_ scene: UIScene) {
+    print(#function) // App faol holatga o‘tdi
+}
+
+func sceneWillResignActive(_ scene: UIScene) {
+    // Ilova passiv holatga o‘tmoqda
+}
+
+func sceneDidEnterBackground(_ scene: UIScene) {
+    // Ilova background’ga tushdi → foydalanuvchi ma'lumotlarini saqlang!
+}
+
+func sceneWillEnterForeground(_ scene: UIScene) {
+    // Ilova yana aktiv bo‘lmoqda
+}
+```
+
+## 📌 Lifecycle Voqealari Zanjiri
+
+```text
+1. App Start:
+   - AppDelegate.didFinishLaunchingWithOptions
+   - SceneDelegate.scene(_:willConnectTo:)
+   - SceneDelegate.sceneDidBecomeActive
+
+2. ViewController Display:
+   - viewDidLoad
+   - viewWillAppear
+   - viewDidAppear
+
+3. App to Background (Home button):
+   - sceneWillResignActive
+   - sceneDidEnterBackground
+
+4. App returns:
+   - sceneWillEnterForeground
+   - sceneDidBecomeActive
+
+5. App closed:
+   - application(_:didDiscardSceneSessions:)
+```
+
+## 📦 Yakuniy Xulosa
+
+`App (1) → Scene (1..n) → ViewController (1..n)`
+
+| Qachon?                          | Qayerda?                              |
+|----------------------------------|----------------------------------------|
+| App ishga tushdi                | AppDelegate                            |
+| Firebase sozlash                | AppDelegate                            |
+| Ilova oynasi tayyor bo‘ldi     | SceneDelegate                          |
+| App aktiv bo‘ldi               | sceneDidBecomeActive                   |
+| App passiv / Background bo‘ldi | sceneDidEnterBackground                |
+| ViewController ko‘rinmoqda     | viewDidLoad, viewDidAppear             |
+| ViewController yopilmoqda      | viewWillDisappear, viewDidDisappear    |
+
+---
+
+## 🎓 Amaliy Misollar
+
+- ✅ **Firebase sozlash:** `AppDelegate.didFinishLaunchingWithOptions`
+- ✅ **Forma saqlash:** `SceneDelegate.sceneDidEnterBackground`
+- ✅ **Qo‘ng‘iroq paytida audio pauza:** `sceneWillResignActive`
+- ✅ **UI animatsiya:** `ViewController.viewDidAppear`
+- ✅ **Forma to‘ldirishni tiklash:** `sceneWillEnterForeground`
+
+---
+
+## ✅ Maslahatlar
+
+1. **Lifecycle’larni yaxshi o‘rganing** – harakatlar aniq vaqtida bajariladi.
+2. **Kod strukturasini saqlang** – har bir voqeani to‘g‘ri joyda yozing.
+3. `print(#function)` bilan **debug qiling** – metodlar qachon chaqirilishini kuzating.
+4. **Foydalanuvchi ma'lumotini har doim saqlang** – ayniqsa background’ga o‘tishda.
+
+---
+
+📌 _Tayyor kod yoki misollar kerak bo‘lsa, bemalol yozing._  
+📈 _Sizning muvaffaqiyatingiz — to‘g‘ri lifecycle'ni tushunishingizdan boshlanadi._ 🔥
